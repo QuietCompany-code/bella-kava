@@ -1,0 +1,598 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BELLA KAVA — Меню кав'ярні</title>
+    <style>
+        :root {
+            --bg: #faf7f2;
+            --card: #ffffff;
+            --coffee: #5c4632;
+            --coffee-dark: #3a2b1e;
+            --orange: #e87a3c;
+            --teal: #3b9c9c;
+            --purple: #5b4b7a;
+            --text: #2b241f;
+            --muted: #7a6f67;
+            --border: #e8e0d5;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 100px;
+        }
+
+        /* Шапка з логотипом BELLA KAVA */
+        header {
+            background: linear-gradient(135deg, var(--coffee-dark), var(--coffee));
+            color: #fff;
+            padding: 32px 20px 26px;
+            text-align: center;
+            border-bottom: 5px solid var(--orange);
+            box-shadow: 0 6px 20px rgba(58, 43, 30, 0.2);
+        }
+        .cup-logo {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #8a7356;
+            border: 3px solid #e6d7c3;
+            padding: 14px 28px;
+            border-radius: 18px 18px 45px 45px;
+            position: relative;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+        .cup-logo::after {
+            content: "";
+            position: absolute;
+            right: -22px;
+            top: 14px;
+            width: 18px;
+            height: 28px;
+            border: 5px solid #8a7356;
+            border-left: none;
+            border-radius: 0 20px 20px 0;
+        }
+        .cup-estd { font-size: 10px; letter-spacing: 2px; color: #f3eadf; text-transform: uppercase; }
+        .cup-title { font-size: 26px; font-weight: 900; line-height: 1.05; letter-spacing: 1px; margin: 3px 0; color: #fff; }
+        .cup-sub { font-size: 9px; letter-spacing: 1.5px; color: #f3eadf; text-transform: uppercase; }
+
+        .header-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .pill-link {
+            background: rgba(255,255,255,0.14);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .pill-link:hover { background: var(--orange); }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 18px 16px;
+        }
+
+        /* Банер про заморожену продукцію */
+        .frozen-banner {
+            background: linear-gradient(90deg, #fff3e6, #ffe4cc);
+            border-left: 5px solid var(--orange);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #523015;
+            font-weight: 600;
+        }
+
+        /* Пошук та категорії */
+        .search-input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--card);
+            margin-bottom: 14px;
+            outline: none;
+        }
+        .search-input:focus { border-color: var(--orange); }
+
+        .categories {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+            scrollbar-width: none;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: 22px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .cat-btn.active {
+            background: var(--coffee-dark);
+            color: #fff;
+            border-color: var(--coffee-dark);
+        }
+
+        /* Картки товарів */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+        }
+        .card-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            background: #f2ebe1;
+            color: var(--coffee);
+            width: fit-content;
+        }
+        .card-title { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
+        .card-desc { font-size: 13px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
+
+        /* Вибір об'єму (250 / 340 / 500 мл тощо) */
+        .size-selector {
+            display: flex;
+            gap: 6px;
+            margin: 8px 0 12px;
+            flex-wrap: wrap;
+        }
+        .size-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .size-btn.selected {
+            background: var(--orange);
+            color: #fff;
+            border-color: var(--orange);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border);
+            margin-top: auto;
+        }
+        .price { font-size: 19px; font-weight: 900; color: var(--coffee-dark); }
+        .add-btn {
+            background: var(--coffee);
+            color: #fff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .add-btn:hover { background: var(--orange); }
+
+        /* Плаваючий кошик */
+        .cart-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 620px;
+            background: var(--coffee-dark);
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 16px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 100;
+        }
+        .cart-bar button {
+            background: var(--orange);
+            color: #fff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Модальне вікно замовлення */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 200;
+        }
+        .modal {
+            background: var(--card);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            padding: 22px;
+            max-height: 82vh;
+            overflow-y: auto;
+        }
+        .cart-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .qty-box button {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-total {
+            margin-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 19px;
+            font-weight: 900;
+        }
+        .close-btn {
+            margin-top: 14px;
+            width: 100%;
+            padding: 12px;
+            background: var(--coffee-dark);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="cup-logo">
+            <span class="cup-estd">ESTD. 2021</span>
+            <div class="cup-title">BELLA<br>KAVA</div>
+            <span class="cup-sub">COFFEE AND CATERING</span>
+        </div>
+        <div class="header-links">
+            <a href="https://maps.app.goo.gl/wbXsKbMhUD3sEh8u7" target="_blank" class="pill-link">📍 Знайти нас на Google Maps</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="frozen-banner">
+            ❄️ <span>Також ви можете придбати всі позиції <strong>млинців, пельменів, вареників та сирників</strong> у замороженому вигляді!</span>
+        </div>
+
+        <input type="text" id="search" class="search-input" placeholder="🔍 Пошук кави, млинців, боулів або страв..." oninput="renderMenu()">
+        <div id="categories" class="categories"></div>
+        <div id="menu-grid" class="menu-grid"></div>
+    </div>
+
+    <!-- Кошик -->
+    <div id="cart-bar" class="cart-bar" onclick="openModal()">
+        <div>🛒 Ваше замовлення: <strong id="cart-count">0</strong> поз. — <strong id="cart-sum">0</strong> грн</div>
+        <button>Відкрити чек</button>
+    </div>
+
+    <!-- Модальне вікно -->
+    <div id="modal-overlay" class="modal-overlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal">
+            <h2 style="margin-bottom: 6px;">🧾 Замовлення BELLA KAVA</h2>
+            <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">Покажіть цей список на касі:</p>
+            <div id="cart-list"></div>
+            <div class="modal-total">
+                <span>Разом до сплати:</span>
+                <span id="modal-sum">0 грн</span>
+            </div>
+            <button class="close-btn" onclick="closeModal()">Продовжити вибір</button>
+        </div>
+    </div>
+
+    <script>
+        // Повна база меню BELLA KAVA з фотографій
+        const MENU_DATA = [
+            // --- КЛАСИКА (КАВА) ---
+            { id: "c1", cat: "☕ Класична кава", name: "Еспресо", variants: [{ label: "30 мл", price: 25 }] },
+            { id: "c2", cat: "☕ Класична кава", name: "Допіо", variants: [{ label: "60 мл", price: 35 }] },
+            { id: "c3", cat: "☕ Класична кава", name: "Американо", variants: [{ label: "140 мл", price: 25 }, { label: "200 мл", price: 35 }] },
+            { id: "c4", cat: "☕ Класична кава", name: "Лате", variants: [{ label: "250 мл", price: 30 }, { label: "340 мл", price: 38 }, { label: "500 мл", price: 46 }] },
+            { id: "c5", cat: "☕ Класична кава", name: "Капучино", variants: [{ label: "250 мл", price: 30 }, { label: "340 мл", price: 38 }, { label: "500 мл", price: 46 }] },
+            { id: "c6", cat: "☕ Класична кава", name: "Флет-вайт", variants: [{ label: "250 мл", price: 38 }] },
+            { id: "c7", cat: "☕ Класична кава", name: "Раф", variants: [{ label: "250 мл", price: 35 }, { label: "340 мл", price: 45 }, { label: "500 мл", price: 55 }] },
+
+            // --- ГАРЯЧІ НАПОЇ ---
+            { id: "h1", cat: "🍫 Гарячі напої", name: "Гарячий шоколад", variants: [{ label: "250 мл", price: 30 }, { label: "340 мл", price: 38 }, { label: "500 мл", price: 46 }] },
+            { id: "h2", cat: "🍫 Гарячі напої", name: "Какао з маршмелоу", variants: [{ label: "250 мл", price: 30 }, { label: "340 мл", price: 38 }, { label: "500 мл", price: 46 }] },
+            { id: "h3", cat: "🍫 Гарячі напої", name: "Чай заварний", variants: [{ label: "340 мл", price: 38 }] },
+
+            // --- МАТЧА МЕНЮ ---
+            { id: "m1", cat: "🍵 Матча меню", name: "Матча зелена", variants: [{ label: "250 мл", price: 45 }] },
+            { id: "m2", cat: "🍵 Матча меню", name: "Матча блакитна", variants: [{ label: "250 мл", price: 52 }] },
+            { id: "m3", cat: "🍵 Матча меню", name: "Матча манго", variants: [{ label: "250 мл", price: 60 }] },
+            { id: "m4", cat: "🍵 Матча меню", name: "Матча чорниця", variants: [{ label: "250 мл", price: 62 }] },
+
+            // --- ХОЛОДНІ НАПОЇ ---
+            { id: "ice1", cat: "🧊 Холодні напої", name: "Мохіто", variants: [{ label: "300 мл", price: 50 }, { label: "400 мл", price: 60 }] },
+            { id: "ice2", cat: "🧊 Холодні напої", name: "Оранж", variants: [{ label: "300 мл", price: 50 }, { label: "400 мл", price: 60 }] },
+            { id: "ice3", cat: "🧊 Холодні напої", name: "Блакитна Лагуна", variants: [{ label: "300 мл", price: 50 }, { label: "400 мл", price: 60 }] },
+            { id: "ice4", cat: "🧊 Холодні напої", name: "Айс Лате", variants: [{ label: "300 мл", price: 45 }, { label: "400 мл", price: 58 }] },
+            { id: "ice5", cat: "🧊 Холодні напої", name: "Еспресо Тонік", variants: [{ label: "300 мл", price: 45 }, { label: "400 мл", price: 55 }] },
+            { id: "ice6", cat: "🧊 Холодні напої", name: "Фрапе", variants: [{ label: "300 мл", price: 50 }, { label: "400 мл", price: 60 }] },
+            { id: "ice7", cat: "🧊 Холодні напої", name: "Лимонад", variants: [{ label: "300 мл", price: 45 }, { label: "400 мл", price: 55 }] },
+            { id: "ice8", cat: "🧊 Холодні напої", name: "Смузі", variants: [{ label: "300 мл", price: 55 }, { label: "400 мл", price: 70 }] },
+            { id: "ice9", cat: "🧊 Холодні напої", name: "Молочний коктейль", variants: [{ label: "300 мл", price: 45 }, { label: "400 мл", price: 55 }] },
+            { id: "ice10", cat: "🧊 Холодні напої", name: "Фруктовий коктейль", variants: [{ label: "300 мл", price: 50 }, { label: "400 мл", price: 60 }] },
+
+            // --- СНІДАНКИ, СИРНИКИ ТА МЛИНЦІ ---
+            { id: "b1", cat: "🥞 Сніданки та Млинці", name: "Домашня гранола", desc: "З йогуртом та фруктами", variants: [{ label: "Порція", price: 95 }] },
+            { id: "b2", cat: "🥞 Сніданки та Млинці", name: "Сирники солодкі", desc: "Зі сметаною та джемом або згущеним молоком", variants: [{ label: "Порція", price: 105 }] },
+            { id: "b3", cat: "🥞 Сніданки та Млинці", name: "Сирники бринза", desc: "Солоні сирники з бринзою", variants: [{ label: "Порція", price: 115 }] },
+            { id: "b4", cat: "🥞 Сніданки та Млинці", name: "Млинці: курка / гриби", variants: [{ label: "Порція", price: 105 }] },
+            { id: "b5", cat: "🥞 Сніданки та Млинці", name: "Млинці: м'ясо", variants: [{ label: "Порція", price: 105 }] },
+            { id: "b6", cat: "🥞 Сніданки та Млинці", name: "Млинці: індичка", variants: [{ label: "Порція", price: 105 }] },
+            { id: "b7", cat: "🥞 Сніданки та Млинці", name: "Млинці: лосось", variants: [{ label: "Порція", price: 129 }] },
+            { id: "b8", cat: "🥞 Сніданки та Млинці", name: "Млинці: бринза", variants: [{ label: "Порція", price: 99 }] },
+            { id: "b9", cat: "🥞 Сніданки та Млинці", name: "Млинці: вишня і крем", variants: [{ label: "Порція", price: 109 }] },
+            { id: "b10", cat: "🥞 Сніданки та Млинці", name: "Млинці: сир солодкий", variants: [{ label: "Порція", price: 99 }] },
+            { id: "b11", cat: "🥞 Сніданки та Млинці", name: "Млинці: карамелізоване яблуко", variants: [{ label: "Порція", price: 99 }] },
+            { id: "b12", cat: "🥞 Сніданки та Млинці", name: "Млинці з яблуком та корицею", variants: [{ label: "Порція", price: 75 }] },
+            { id: "b13", cat: "🥞 Сніданки та Млинці", name: "Млинці з творогом", variants: [{ label: "Порція", price: 85 }] },
+            { id: "b14", cat: "🥞 Сніданки та Млинці", name: "Млинці зі згущеним молоком", variants: [{ label: "Порція", price: 75 }] },
+            { id: "b15", cat: "🥞 Сніданки та Млинці", name: "Млинці з бананом та «Нутелою»", variants: [{ label: "Порція", price: 85 }] },
+
+            // --- БОУЛИ ТА САЛАТИ ---
+            { id: "s1", cat: "🥗 Боули та Салати", name: "Боул з індичкою", desc: "Запечене філе індички, кус-кус, авокадо, свіжі овочі, сир Філадельфія, пікантний соус", variants: [{ label: "Порція", price: 139 }] },
+            { id: "s2", cat: "🥗 Боули та Салати", name: "Боул з лососем", desc: "Лосось с/с, кус-кус, авокадо, свіжі овочі, мікс салат, чука, пікантний соус", variants: [{ label: "Порція", price: 189 }] },
+            { id: "s3", cat: "🥗 Боули та Салати", name: "Салат зі свіжих овочів, авокадо та сиром Філадельфія", variants: [{ label: "Порція", price: 119 }] },
+            { id: "s4", cat: "🥗 Боули та Салати", name: "Салат Мега овочевий з індичкою", variants: [{ label: "Порція", price: 195 }] },
+            { id: "s5", cat: "🥗 Боули та Салати", name: "Цезар з лососем", variants: [{ label: "Порція", price: 235 }] },
+            { id: "s6", cat: "🥗 Боули та Салати", name: "Салат Моцарела та в'ялені томати", variants: [{ label: "Порція", price: 195 }] },
+
+            // --- ОСНОВНЕ МЕНЮ ---
+            { id: "main1", cat: "🍔 Основні страви", name: "Фірмовий бургер", variants: [{ label: "Порція", price: 239 }] },
+            { id: "main2", cat: "🍔 Основні страви", name: "Паста карбонара", variants: [{ label: "Порція", price: 215 }] },
+            { id: "main3", cat: "🍔 Основні страви", name: "Англійський сніданок", variants: [{ label: "Порція", price: 199 }] },
+            { id: "main4", cat: "🍔 Основні страви", name: "Пельмені індичка", variants: [{ label: "Порція", price: 119 }] },
+            { id: "main5", cat: "🍔 Основні страви", name: "Пельмені телятина", variants: [{ label: "Порція", price: 119 }] },
+            { id: "main6", cat: "🍔 Основні страви", name: "Пельмені свинина", variants: [{ label: "Порція", price: 109 }] },
+            { id: "main7", cat: "🍔 Основні страви", name: "Вареники з м'ясом", variants: [{ label: "Порція", price: 125 }] },
+            { id: "main8", cat: "🍔 Основні страви", name: "Деруни зі сметаною", variants: [{ label: "Порція", price: 115 }] },
+            { id: "main9", cat: "🍔 Основні страви", name: "Суп грибний", variants: [{ label: "Порція", price: 109 }] },
+            { id: "main10", cat: "🍔 Основні страви", name: "Суп шпинат / броколі", variants: [{ label: "Порція", price: 110 }] },
+            { id: "main11", cat: "🍔 Основні страви", name: "Бульйон", variants: [{ label: "Порція", price: 90 }] },
+            { id: "main12", cat: "🍔 Основні страви", name: "Солянка", variants: [{ label: "Порція", price: 130 }] },
+
+            // --- ФРИТЮР ---
+            { id: "fr1", cat: "🍟 Фритюр", name: "Картопля фрі", variants: [{ label: "Порція", price: 60 }] },
+            { id: "fr2", cat: "🍟 Фритюр", name: "Картопля по-селянськи", variants: [{ label: "Порція", price: 67 }] },
+            { id: "fr3", cat: "🍟 Фритюр", name: "Сир в паніровці", variants: [{ label: "Порція", price: 79 }] },
+            { id: "fr4", cat: "🍟 Фритюр", name: "Нагетси курячі", variants: [{ label: "Порція", price: 70 }] },
+
+            // --- ДОДАТКИ ---
+            { id: "add1", cat: "➕ Додатки", name: "Молоко рослинне (до кави)", variants: [{ label: "Порція", price: 20 }] },
+            { id: "add2", cat: "➕ Додатки", name: "Молоко безлактозне (до кави)", variants: [{ label: "Порція", price: 15 }] },
+            { id: "add3", cat: "➕ Додатки", name: "Молоко / Лимон (до напоїв)", variants: [{ label: "Молоко", price: 4 }, { label: "Лимон", price: 4 }] },
+            { id: "add4", cat: "➕ Додатки", name: "Вершки / Мед / Сироп / Згущене молоко", variants: [{ label: "Вершки", price: 5 }, { label: "Мед", price: 5 }, { label: "Сироп", price: 5 }, { label: "Згущ. молоко", price: 5 }] },
+            { id: "add5", cat: "➕ Додатки", name: "Декав (кава без кофеїну)", variants: [{ label: "Опція", price: 6 }] },
+            { id: "add6", cat: "➕ Додатки", name: "Картопля по-селянськи до бургера", variants: [{ label: "Додаток", price: 30 }] },
+            { id: "add7", cat: "➕ Додатки", name: "Індичка (додаток до страви)", variants: [{ label: "Додаток", price: 50 }] },
+            { id: "add8", cat: "➕ Додатки", name: "Бекон / Гриби (до страви)", variants: [{ label: "Бекон", price: 25 }, { label: "Гриби", price: 25 }] },
+            { id: "add9", cat: "➕ Додатки", name: "Соус / Хліб", variants: [{ label: "Соус", price: 15 }, { label: "Хліб", price: 15 }] }
+        ];
+
+        let activeCategory = "Усі";
+        let selectedVariants = {}; // id -> index обраного об'єму
+        let cart = {}; // key (id_variantIndex) -> qty
+
+        function init() {
+            MENU_DATA.forEach(item => { selectedVariants[item.id] = 0; });
+            renderCategories();
+            renderMenu();
+        }
+
+        function renderCategories() {
+            const cats = ["Усі", ...new Set(MENU_DATA.map(i => i.cat))];
+            const wrap = document.getElementById("categories");
+            wrap.innerHTML = "";
+            cats.forEach(c => {
+                const btn = document.createElement("button");
+                btn.className = "cat-btn" + (c === activeCategory ? " active" : "");
+                btn.innerText = c;
+                btn.onclick = () => {
+                    activeCategory = c;
+                    renderCategories();
+                    renderMenu();
+                };
+                wrap.appendChild(btn);
+            });
+        }
+
+        function selectVariant(itemId, vIndex) {
+            selectedVariants[itemId] = vIndex;
+            renderMenu();
+        }
+
+        function renderMenu() {
+            const q = document.getElementById("search").value.toLowerCase();
+            const grid = document.getElementById("menu-grid");
+            grid.innerHTML = "";
+
+            const items = MENU_DATA.filter(item => {
+                const matchCat = activeCategory === "Усі" || item.cat === activeCategory;
+                const matchSearch = item.name.toLowerCase().includes(q) || (item.desc && item.desc.toLowerCase().includes(q));
+                return matchCat && matchSearch;
+            });
+
+            items.forEach(item => {
+                const vIdx = selectedVariants[item.id] || 0;
+                const currentVar = item.variants[vIdx];
+
+                let sizesHtml = "";
+                if (item.variants.length > 1) {
+                    sizesHtml = `<div class="size-selector">` +
+                        item.variants.map((v, idx) =>
+                            `<button class="size-btn ${idx === vIdx ? 'selected' : ''}" onclick="selectVariant('${item.id}', ${idx})">${v.label} — ${v.price} ₴</button>`
+                        ).join("") +
+                        `</div>`;
+                } else {
+                    sizesHtml = `<div style="font-size:12px; color:var(--muted); margin-bottom:10px;">Об'єм / Вихід: <strong>${currentVar.label}</strong></div>`;
+                }
+
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <div>
+                        <span class="card-badge">${item.cat}</span>
+                        <div class="card-title">${item.name}</div>
+                        ${item.desc ? `<div class="card-desc">${item.desc}</div>` : ""}
+                        ${sizesHtml}
+                    </div>
+                    <div class="card-footer">
+                        <span class="price">${currentVar.price} грн</span>
+                        <button class="add-btn" onclick="addToCart('${item.id}', ${vIdx})">+ Додати</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addToCart(itemId, vIdx) {
+            const key = `${itemId}__${vIdx}`;
+            cart[key] = (cart[key] || 0) + 1;
+            updateCartUI();
+        }
+
+        function changeCartQty(key, delta) {
+            if (!cart[key]) return;
+            cart[key] += delta;
+            if (cart[key] <= 0) delete cart[key];
+            updateCartUI();
+            renderModalList();
+        }
+
+        function updateCartUI() {
+            let count = 0;
+            let sum = 0;
+            for (const [key, qty] of Object.entries(cart)) {
+                const [itemId, vIdx] = key.split("__");
+                const item = MENU_DATA.find(i => i.id === itemId);
+                if (item) {
+                    count += qty;
+                    sum += item.variants[Number(vIdx)].price * qty;
+                }
+            }
+            const bar = document.getElementById("cart-bar");
+            if (count > 0) {
+                bar.style.display = "flex";
+                document.getElementById("cart-count").innerText = count;
+                document.getElementById("cart-sum").innerText = sum;
+            } else {
+                bar.style.display = "none";
+                closeModal();
+            }
+        }
+
+        function openModal() {
+            renderModalList();
+            document.getElementById("modal-overlay").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modal-overlay").style.display = "none";
+        }
+
+        function renderModalList() {
+            const list = document.getElementById("cart-list");
+            list.innerHTML = "";
+            let total = 0;
+
+            for (const [key, qty] of Object.entries(cart)) {
+                const [itemId, vIdx] = key.split("__");
+                const item = MENU_DATA.find(i => i.id === itemId);
+                const variant = item.variants[Number(vIdx)];
+                const rowSum = variant.price * qty;
+                total += rowSum;
+
+                const row = document.createElement("div");
+                row.className = "cart-row";
+                row.innerHTML = `
+                    <div>
+                        <strong>${item.name}</strong> <span style="color:var(--muted);">(${variant.label})</span><br>
+                        <span style="font-size:12px; color:var(--muted);">${variant.price} грн × ${qty} = ${rowSum} грн</span>
+                    </div>
+                    <div class="qty-box">
+                        <button onclick="changeCartQty('${key}', -1)">-</button>
+                        <span style="margin:0 8px; font-weight:bold;">${qty}</span>
+                        <button onclick="changeCartQty('${key}', 1)">+</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            }
+            document.getElementById("modal-sum").innerText = `${total} грн`;
+        }
+
+        init();
+    </script>
+</body>
+</html>
