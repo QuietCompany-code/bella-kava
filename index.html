@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
@@ -11,8 +11,8 @@
             --coffee: #5c4632;
             --coffee-dark: #3a2b1e;
             --orange: #e87a3c;
-            --teal: #3b9c9c;
-            --purple: #5b4b7a;
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
             --text: #2b241f;
             --muted: #7a6f67;
             --border: #e8e0d5;
@@ -102,7 +102,7 @@
             font-weight: 600;
         }
 
-        /* Пошук та категорії */
+        /* Пошук */
         .search-input {
             width: 100%;
             padding: 13px 16px;
@@ -115,15 +115,56 @@
         }
         .search-input:focus { border-color: var(--orange); }
 
+        /* Обгортка категорій зі стрілками для зручного гортання */
+        .categories-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .scroll-arrow {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--coffee-dark);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .scroll-arrow:hover {
+            background: var(--orange);
+            color: #fff;
+            border-color: var(--orange);
+        }
         .categories {
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 18px;
-            scrollbar-width: none;
+            scroll-behavior: smooth;
+            padding: 4px 2px 10px;
+            flex-grow: 1;
+            cursor: grab;
+            scrollbar-width: thin;
+            scrollbar-color: #d5c8b8 transparent;
         }
-        .categories::-webkit-scrollbar { display: none; }
+        .categories:active { cursor: grabbing; }
+        .categories::-webkit-scrollbar { height: 6px; }
+        .categories::-webkit-scrollbar-track { background: transparent; }
+        .categories::-webkit-scrollbar-thumb {
+            background: #d5c8b8;
+            border-radius: 10px;
+        }
+        .categories::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
         .cat-btn {
             background: var(--card);
             border: 1px solid var(--border);
@@ -135,7 +176,9 @@
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.2s;
+            user-select: none;
         }
+        .cat-btn:hover { border-color: var(--orange); }
         .cat-btn.active {
             background: var(--coffee-dark);
             color: #fff;
@@ -173,7 +216,7 @@
         .card-title { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
         .card-desc { font-size: 13px; color: var(--muted); line-height: 1.4; margin-bottom: 10px; }
 
-        /* Вибір об'єму (250 / 340 / 500 мл тощо) */
+        /* Вибір об'єму */
         .size-selector {
             display: flex;
             gap: 6px;
@@ -269,6 +312,29 @@
             max-height: 82vh;
             overflow-y: auto;
         }
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .clear-cart-btn {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .clear-cart-btn:hover {
+            background: var(--danger);
+            color: #fff;
+        }
         .cart-row {
             display: flex;
             justify-content: space-between;
@@ -325,7 +391,14 @@
         </div>
 
         <input type="text" id="search" class="search-input" placeholder="🔍 Пошук кави, млинців, боулів або страв..." oninput="renderMenu()">
-        <div id="categories" class="categories"></div>
+        
+        <!-- Панель категорій зі стрілками прокрутки -->
+        <div class="categories-wrapper">
+            <button class="scroll-arrow" onclick="scrollCategories(-240)" title="Гортати вліво">◀</button>
+            <div id="categories" class="categories"></div>
+            <button class="scroll-arrow" onclick="scrollCategories(240)" title="Гортати вправо">▶</button>
+        </div>
+
         <div id="menu-grid" class="menu-grid"></div>
     </div>
 
@@ -338,7 +411,10 @@
     <!-- Модальне вікно -->
     <div id="modal-overlay" class="modal-overlay" onclick="if(event.target===this) closeModal()">
         <div class="modal">
-            <h2 style="margin-bottom: 6px;">🧾 Замовлення BELLA KAVA</h2>
+            <div class="modal-header-row">
+                <h2>🧾 Замовлення</h2>
+                <button class="clear-cart-btn" onclick="clearCart()">🗑️ Очистити весь чек</button>
+            </div>
             <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">Покажіть цей список на касі:</p>
             <div id="cart-list"></div>
             <div class="modal-total">
@@ -350,7 +426,7 @@
     </div>
 
     <script>
-        // Повна база меню BELLA KAVA з фотографій
+        // Повна база меню BELLA KAVA
         const MENU_DATA = [
             // --- КЛАСИКА (КАВА) ---
             { id: "c1", cat: "☕ Класична кава", name: "Еспресо", variants: [{ label: "30 мл", price: 25 }] },
@@ -442,13 +518,43 @@
         ];
 
         let activeCategory = "Усі";
-        let selectedVariants = {}; // id -> index обраного об'єму
-        let cart = {}; // key (id_variantIndex) -> qty
+        let selectedVariants = {};
+        let cart = {};
 
         function init() {
             MENU_DATA.forEach(item => { selectedVariants[item.id] = 0; });
             renderCategories();
             renderMenu();
+            enableDragScroll();
+        }
+
+        // Гортання категорій кнопками-стрілками
+        function scrollCategories(amount) {
+            const wrap = document.getElementById("categories");
+            wrap.scrollBy({ left: amount, behavior: 'smooth' });
+        }
+
+        // Можливість тягнути категорії мишкою
+        function enableDragScroll() {
+            const slider = document.getElementById("categories");
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener("mousedown", (e) => {
+                isDown = true;
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener("mouseleave", () => { isDown = false; });
+            slider.addEventListener("mouseup", () => { isDown = false; });
+            slider.addEventListener("mousemove", (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                slider.scrollLeft = scrollLeft - walk;
+            });
         }
 
         function renderCategories() {
@@ -529,6 +635,13 @@
             if (cart[key] <= 0) delete cart[key];
             updateCartUI();
             renderModalList();
+        }
+
+        // Очищення всього чека однією кнопкою
+        function clearCart() {
+            cart = {};
+            updateCartUI();
+            closeModal();
         }
 
         function updateCartUI() {
